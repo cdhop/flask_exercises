@@ -9,7 +9,7 @@ class BasicTestCase(unittest.TestCase):
     def test_index(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.asertTrue('success' in str(response.data))
+        self.assertTrue('success' in str(response.data))
 
 if __name__ == '__main__':
     unittest.main()
