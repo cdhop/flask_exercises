@@ -1,11 +1,14 @@
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask import Flask, request
-import os.path
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.script import Manager, Shell 
 import json
+import os.path
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+manager = Manager(app)
+
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -30,6 +33,11 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+
+manager.add_command("shell", Shell(make_context=make_shell_context))
 
 @app.route('/')
 def index():
@@ -292,4 +300,4 @@ def delete_role(role_id):
     return json.dumps(result), code
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
